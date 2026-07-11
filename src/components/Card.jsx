@@ -1,13 +1,7 @@
-function Card({ color, isFlipped, isMatched, onClick }) {
+function Card({ image }) {
   return (
-    <div
-      onClick={onClick}
-      className={`w-16 h-16 rounded-xl cursor-pointer transition-all duration-300 flex items-center justify-center text-2xl font-bold
-        ${isMatched ? 'opacity-0 pointer-events-none' : ''}
-        ${isFlipped ? `bg-${color}-500 text-white` : 'bg-gray-300 hover:bg-gray-400'}
-      `}
-    >
-      {isFlipped && '?'}
+    <div className="w-20 h-20 bg-white rounded-xl flex items-center justify-center overflow-hidden">
+      <img src={image} alt="card" className="w-16 h-16 object-contain" />
     </div>
   )
 }
