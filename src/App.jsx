@@ -4,14 +4,14 @@ import Board from './components/Board'
 function App() {
   // Array with images
   const images = [
-    '/images/red.png',
-    '/images/orange.png',
-    '/images/yellow.png',
-    '/images/green.png',
-    '/images/cyan.png',
-    '/images/blue.png',
-    '/images/purple.png',
-    '/images/white.png',
+    '/second-project/images/red.png',
+    '/second-project/images/orange.png',
+    '/second-project/images/yellow.png',
+    '/second-project/images/green.png',
+    '/second-project/images/cyan.png',
+    '/second-project/images/blue.png',
+    '/second-project/images/purple.png',
+    '/second-project/images/white.png',
   ]
 
   // Generate and shuffle cards
@@ -30,11 +30,60 @@ function App() {
   // States
   const [cards, setCards] = useState(generateCards())
   const [moves, setMoves] = useState(0)
+  const [flippedIndices, setFlippedIndices] = useState([])
+  const [isLocked, setIsLocked] = useState(false)
 
   // Reset game
   const resetGame = () => {
     setCards(generateCards())
     setMoves(0)
+  }
+
+  // --- When card is clicked ---
+  const handleCardClick = (index) => {
+    // Exit if found
+    if (isLocked) return
+    if (cards[index].isFlipped || cards[index].isMatched) return
+
+    // Copy array and flip card
+    const newCards = [...cards]
+    newCards[index].isFlipped = true
+    setCards(newCards)
+
+    // Set indices to opened cards to check coincidence
+    const newFlipped = [...flippedIndices, index]
+    setFlippedIndices(newFlipped)
+
+    // If 2 cards selected, check coincidence
+    if (newFlipped.length === 2) {
+      setMoves(moves + 1)
+      setIsLocked(true)
+
+      const firstIndex = newFlipped[0]
+      const secondIndex = newFlipped[1]
+
+      // If they coincide
+      if (cards[firstIndex].image === cards[secondIndex].image) {
+        setTimeout(() => {
+          const matchedCards = [...cards]
+          matchedCards[firstIndex].isMatched = true
+          matchedCards[secondIndex].isMatched = true
+          setCards(matchedCards)
+          setFlippedIndices([])
+          setIsLocked(false)
+        }, 500)
+      } else {
+        // If they doesn't coincide
+        setTimeout(() => {
+          const resetCards = [...cards]
+          resetCards[firstIndex].isFlipped = false
+          resetCards[secondIndex].isFlipped = false
+          setCards(resetCards)
+          setFlippedIndices([])
+          setIsLocked(false)
+        }, 800)
+      }
+    }
   }
 
   return (
@@ -45,7 +94,7 @@ function App() {
       <p className="text-lg mb-4 text-red-500">Ходы: {moves}</p>
 
       {/* Board with cards */}
-      <Board cards={cards} />
+      <Board cards={cards} onCardClick={handleCardClick}/>
 
       {/* New game button */}
       <button
@@ -54,6 +103,7 @@ function App() {
       >
         Новая игра
       </button>
+
     </div>
   )
 }
